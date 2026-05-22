@@ -1,17 +1,249 @@
+version: '3.8'
+
 services:
-  postgres:
-    image: postgres:16
-    container_name: postgres-db
-    restart: always
+  # ------ Infrastructure ------------------------------------------------------
+  mongo:
+    image: mongo:7
+    container_name: amazon_mongo
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1"
+        reservations:
+          memory: 256M
+          cpus: "0.5"
+    ports:
+      - "${MONGO_PORT}:${MONGO_PORT}"
+    volumes:
+      - mongo_data:/data/db
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: amazondb
-    ports:
-      - "5432:5432"
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - amazon_network
+
   redis:
-    image: redis:7
-    container_name: redis_cache
-    restart: always
+    image: redis:7-alpine
+    container_name: amazon_redis
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+        reservations:
+          memory: 64M
+          cpus: "0.125"
     ports:
-    - "6479:6379"
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - amazon_network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: amazon_rabbitmq
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+        reservations:
+          memory: 128M
+          cpus: "0.25"
+    ports:
+      - "${RABBITMQ_PORT_1}:${RABBITMQ_PORT_1}"
+      - "${RABBITMQ_PORT_2}:${RABBITMQ_PORT_2}"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - amazon_network
+
+  # ------ Microservices ------------------------------------------------------
+  user-service:
+    build: ./services/user-service
+    container_name: amazon_user_service
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+        reservations:
+          memory: 128M
+          cpus: "0.25"
+    ports:
+      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
+    environment:
+      PORT: ${USER_SERVICE_PORT}
+      MONGO_URI: ${USER_SERVICE_MONGO_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_URL: ${REDIS_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+    depends_on:
+      - mongo
+      - redis
+      - rabbitmq
+    networks:
+      - amazon_network
+
+  product-service:
+    build: ./services/product-service
+    container_name: amazon_product_service
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+        reservations:
+          memory: 128M
+          cpus: "0.25"
+    ports:
+      - "${PRODUCT_SERVICE_PORT}:${PRODUCT_SERVICE_PORT}"
+    environment:
+      PORT: ${PRODUCT_SERVICE_PORT}
+      MONGO_URI: ${PRODUCT_SERVICE_MONGO_URI}
+      REDIS_URL: ${REDIS_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+    depends_on:
+      - mongo
+      - redis
+      - rabbitmq
+    networks:
+      - amazon_network
+
+  cart-service:
+    build: ./services/cart-service
+    container_name: amazon_cart_service
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+        reservations:
+          memory: 64M
+          cpus: "0.125"
+    ports:
+      - "${CART_SERVICE_PORT}:${CART_SERVICE_PORT}"
+    environment:
+      PORT: ${CART_SERVICE_PORT}
+      MONGO_URI: ${CART_SERVICE_MONGO_URI}
+      REDIS_URL: ${REDIS_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+    depends_on:
+      - mongo
+      - redis
+      - rabbitmq
+    networks:
+      - amazon_network
+
+  order-service:
+    build: ./services/order-service
+    container_name: amazon_order_service
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+        reservations:
+          memory: 64M
+          cpus: "0.125"
+    ports:
+      - "${ORDER_SERVICE_PORT}:${ORDER_SERVICE_PORT}"
+    environment:
+      PORT: ${ORDER_SERVICE_PORT}
+      MONGO_URI: ${ORDER_SERVICE_MONGO_URI}
+      REDIS_URL: ${REDIS_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+    depends_on:
+      - mongo
+      - redis
+      - rabbitmq
+    networks:
+      - amazon_network
+  
+  notification-service:
+    build: ./services/notification-service
+    container_name: amazon_notification_service
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+        reservations:
+          memory: 64M
+          cpus: "0.125"
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT}:${NOTIFICATION_SERVICE_PORT}"
+    environment:
+      PORT: ${NOTIFICATION_SERVICE_PORT}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+    depends_on:
+      - rabbitmq
+    networks:
+      - amazon_network
+
+  api-gateway:
+    build: ./services/api-gateway
+    container_name: amazon_api_gateway
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+        reservations:
+          memory: 128M
+          cpus: "0.25"
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    environment:
+      PORT: ${API_GATEWAY_PORT}
+      USER_SERVICE_URL: ${USER_SERVICE_URL}
+      PRODUCT_SERVICE_URL: ${PRODUCT_SERVICE_URL}
+      CART_SERVICE_URL: ${CART_SERVICE_URL}
+      ORDER_SERVICE_URL: ${ORDER_SERVICE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_URL: ${REDIS_URL}
+    depends_on:
+      - user-service
+      - product-service
+      - cart-service
+      - order-service
+      - redis
+    networks:
+      - amazon_network
+
+  # ------ FRONTEND ------------------------------------------------------
+  frontend:
+    build: ./frontend
+    container_name: amazon_frontend
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: "0.25"
+        reservations:
+          memory: 32M
+          cpus: "0.125"
+    ports:
+      - "${FRONTEND_BIND_PORT}:${FRONTEND_PORT}"
+    depends_on:
+      - api-gateway
+    networks:
+      - amazon_network
+
+volumes:
+  mongo_data:
+
+networks:
+  amazon_network:
+    driver: bridge

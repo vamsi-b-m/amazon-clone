@@ -1,0 +1,28 @@
+# ─── Secrets ──────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Dependencies ─────────────────────────────────────
+node_modules/
+**/node_modules/
+
+# ─── React build output ───────────────────────────────
+frontend/build/
+
+# ─── Logs ─────────────────────────────────────────────
+*.log
+npm-debug.log*
+logs/
+
+# ─── OS files ─────────────────────────────────────────
+.DS_Store         # Mac
+Thumbs.db         # Windows
+
+# ─── Docker ───────────────────────────────────────────
+docker-compose.override.yml
+
+# ─── IDE files ────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
