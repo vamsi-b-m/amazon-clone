@@ -50,7 +50,7 @@ jobs:
             # tag with PR Number: amazon-clone-api-gateway:pr-42
             type=ref,event=pr
             # tag with commit SHA: amazon-clone-api-gateway:sha-a1b2c3d4
-            type=ref,prefix=sha-
+            type=sha,prefix=sha-
             # tag latest only on the main branch
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
       # 4. Setup Docker Buildx ( enables caching + multi-platform )
