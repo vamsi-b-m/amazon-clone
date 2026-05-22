@@ -21,6 +21,7 @@ Thumbs.db         # Windows
 
 # ─── Docker ───────────────────────────────────────────
 docker-compose.override.yml
+DEVOPS_SPEC.md
 
 # ─── IDE files ────────────────────────────────────────
 .vscode/
