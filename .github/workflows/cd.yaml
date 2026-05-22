@@ -1,0 +1,38 @@
+name: CD - Deploy
+
+on:
+  push:
+    branches: [ main, staging, dev ]
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+
+    # This is what linkes the job to the right environment secrets
+    # When branch is main ->  uses main environment secrets   -> prod server
+    # When branch is staging -> uses staging secrets          -> staging server
+    # When branch is dev  ->  uses dev secrets                -> dev server
+    environment: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: vars
+        run: echo "SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Deploy to ${{ github.ref_name }} server via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key:  ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd /opt/amazon-clone
+            export IMAGE_TAG=sha-${{ steps.vars.outputs.SHA }}
+            export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            docker compose pull
+            docker compose up -d --no-build
+            docker image prune -f
