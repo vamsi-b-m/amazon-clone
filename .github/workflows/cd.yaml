@@ -1,24 +1,32 @@
 name: CD - Deploy
 
 on:
-  push:
-    branches: [ main, staging, dev ]
+  workflow_run:
+    workflows: ["CI - Build and Push Image"]  # must match exactly your CI workflow name
+    branches: [main, staging, dev]
+    types:
+      - completed
 
 jobs:
   deploy:
-    name: Deploy to ${{ github.ref_name }}
+    name: Deploy to ${{ github.event.workflow_run.head_branch }}
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}
+
+    # Only deploy if CI passed — skip if CI failed
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    environment: ${{ github.event.workflow_run.head_branch }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Set image tag
         id: vars
         run: echo "SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-      # NEW: Copy prod compose file to server before deploying
       - name: Copy prod compose file to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -28,7 +36,7 @@ jobs:
           source: "docker-compose.prod.yaml"
           target: "/opt/amazon-clone/"
 
-      - name: Deploy to ${{ github.ref_name }} server via SSH
+      - name: Deploy to ${{ github.event.workflow_run.head_branch }} server via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -37,17 +45,12 @@ jobs:
           script: |
             cd /opt/amazon-clone
 
-            # Login to Docker Hub so private images can be pulled
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
             export IMAGE_TAG=sha-${{ steps.vars.outputs.SHA }}
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
 
-            # Pull latest images from Docker Hub using prod compose file
             docker compose -f docker-compose.prod.yaml pull
-
-            # Restart containers with new images
-            docker compose -f docker-compose.prod.yaml up -d
-
-            # Clean up old images to free disk space
+            docker compose -f docker-compose.prod.yaml up -d --force-recreate
             docker image prune -f
+  

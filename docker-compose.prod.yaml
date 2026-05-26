@@ -191,7 +191,7 @@ services:
       - amazon_network
 
   api-gateway:
-    image: ${DOCKERHUB_USERNAME}/amazon-clone-user-service:latest
+    image: ${DOCKERHUB_USERNAME}/amazon-clone-api-gateway:latest
     container_name: amazon_api_gateway
     restart: unless-stopped
     deploy:
