@@ -15,14 +15,23 @@ jobs:
 
     strategy:
       matrix:
-        service:
-          - api-gateway
-          - user-service
-          - product-service
-          - cart-service
-          - order-service
-          - notification-service
-          - frontend
+        include:
+          # Backend services — use cache for faster builds
+          - service: api-gateway
+            use_cache: true
+          - service: user-service
+            use_cache: true
+          - service: product-service
+            use_cache: true
+          - service: cart-service
+            use_cache: true
+          - service: order-service
+            use_cache: true
+          - service: notification-service
+            use_cache: true
+          # Frontend — always fresh build, never use cache
+          - service: frontend
+            use_cache: false
 
     steps:
       - name: Checkout
@@ -55,9 +64,9 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          no-cache: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: ${{ !matrix.use_cache }}
+          cache-from: ${{ matrix.use_cache && 'type=gha' || '' }}
+          cache-to: ${{ matrix.use_cache && 'type=gha,mode=max' || '' }}
 
   # ─── CD ───────────────────────────────────────────────────────
   deploy:
@@ -65,8 +74,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
 
-    # Waits for ALL 7 CI matrix jobs to pass
-    # If any single one fails → deploy is skipped
+    # Waits for ALL CI matrix jobs to pass
+    # If any single build fails → deploy is skipped entirely
     needs: build-and-push
 
     # Never deploy on pull requests
