@@ -8,11 +8,6 @@ jobs:
   deploy:
     name: Deploy to ${{ github.ref_name }}
     runs-on: ubuntu-latest
-
-    # This is what linkes the job to the right environment secrets
-    # When branch is main ->  uses main environment secrets   -> prod server
-    # When branch is staging -> uses staging secrets          -> staging server
-    # When branch is dev  ->  uses dev secrets                -> dev server
     environment: ${{ github.ref_name }}
 
     steps:
@@ -23,16 +18,36 @@ jobs:
         id: vars
         run: echo "SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
+      # NEW: Copy prod compose file to server before deploying
+      - name: Copy prod compose file to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "docker-compose.prod.yaml"
+          target: "/opt/amazon-clone/"
+
       - name: Deploy to ${{ github.ref_name }} server via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key:  ${{ secrets.DEPLOY_SSH_KEY }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             cd /opt/amazon-clone
+
+            # Login to Docker Hub so private images can be pulled
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
             export IMAGE_TAG=sha-${{ steps.vars.outputs.SHA }}
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            docker compose pull
-            docker compose up -d --no-build
+
+            # Pull latest images from Docker Hub using prod compose file
+            docker compose -f docker-compose.prod.yaml pull
+
+            # Restart containers with new images
+            docker compose -f docker-compose.prod.yaml up -d
+
+            # Clean up old images to free disk space
             docker image prune -f
