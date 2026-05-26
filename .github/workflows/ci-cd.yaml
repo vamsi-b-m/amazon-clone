@@ -55,6 +55,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          no-cache: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -64,11 +65,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
 
-    # ✅ Waits for ALL matrix CI jobs to complete successfully
-    # If any service build fails → deploy is skipped
+    # Waits for ALL 7 CI matrix jobs to pass
+    # If any single one fails → deploy is skipped
     needs: build-and-push
 
-    # Don't deploy on pull requests
+    # Never deploy on pull requests
     if: github.event_name != 'pull_request'
 
     steps:
@@ -97,11 +98,17 @@ jobs:
           script: |
             cd /opt/amazon-clone
 
+            # Login to Docker Hub
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
             export IMAGE_TAG=sha-${{ steps.vars.outputs.SHA }}
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
 
+            # Pull latest images from Docker Hub
             docker compose -f docker-compose.prod.yaml pull
+
+            # Restart all containers with new images
             docker compose -f docker-compose.prod.yaml up -d --force-recreate
+
+            # Clean up old images to free disk space
             docker image prune -f
