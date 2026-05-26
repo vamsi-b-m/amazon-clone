@@ -64,7 +64,7 @@ services:
 
   # ------ Microservices ------------------------------------------------------
   user-service:
-    build: ./services/user-service
+    image: ${DOCKERHUB_USERNAME}/amazon-clone-user-service:latest
     container_name: amazon_user_service
     restart: unless-stopped
     deploy:
@@ -91,7 +91,7 @@ services:
       - amazon_network
 
   product-service:
-    build: ./services/product-service
+    image: ${DOCKERHUB_USERNAME}/amazon-clone-product-service:latest
     container_name: amazon_product_service
     restart: unless-stopped
     deploy:
@@ -117,7 +117,7 @@ services:
       - amazon_network
 
   cart-service:
-    build: ./services/cart-service
+    image: ${DOCKERHUB_USERNAME}/amazon-clone-cart-service:latest
     container_name: amazon_cart_service
     restart: unless-stopped
     deploy:
@@ -143,7 +143,7 @@ services:
       - amazon_network
 
   order-service:
-    build: ./services/order-service
+    image: ${DOCKERHUB_USERNAME}/amazon-clone-order-service:latest
     container_name: amazon_order_service
     restart: unless-stopped
     deploy:
@@ -169,7 +169,7 @@ services:
       - amazon_network
   
   notification-service:
-    build: ./services/notification-service
+    image: ${DOCKERHUB_USERNAME}/amazon-clone-notification-service:latest
     container_name: amazon_notification_service
     restart: unless-stopped
     deploy:
@@ -191,7 +191,7 @@ services:
       - amazon_network
 
   api-gateway:
-    build: ./services/api-gateway
+    image: ${DOCKERHUB_USERNAME}/amazon-clone-user-service:latest
     container_name: amazon_api_gateway
     restart: unless-stopped
     deploy:
@@ -223,7 +223,7 @@ services:
 
   # ------ FRONTEND ------------------------------------------------------
   frontend:
-    build: ./frontend
+    image: ${DOCKERHUB_USERNAME}/amazon-clone-frontend:latest
     container_name: amazon_frontend
     restart: unless-stopped
     deploy:
