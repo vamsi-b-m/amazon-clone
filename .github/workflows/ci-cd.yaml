@@ -102,7 +102,6 @@ jobs:
             export IMAGE_TAG=sha-${{ steps.vars.outputs.SHA }}
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
 
-            mv docker-compose.prod.yaml docker-compose.yaml
-            docker compose pull
-            docker compose up -d --force-recreate
+            docker compose -f docker-compose.prod.yaml pull
+            docker compose -f docker-compose.prod.yaml up -d --force-recreate
             docker image prune -f
