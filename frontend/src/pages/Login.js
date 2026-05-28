@@ -17,7 +17,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(form.email, form.password);
-      addToast('Welcome back! 👋');
+      addToast('Welcome back bruhh! 👋');
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to sign in');
