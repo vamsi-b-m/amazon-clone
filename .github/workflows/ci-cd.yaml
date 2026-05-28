@@ -67,9 +67,15 @@ jobs:
   deploy:
     name: CD - Deploy to ${{ github.ref_name }}
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name }}
     needs: build-and-push
-    if: github.event_name != 'pull_request'
+    if: |
+      github.event_name != 'pull_request' &&
+      (
+        github.ref == 'refs/heads/dev' ||
+        github.ref == 'refs/heads/staging' ||
+        github.ref == 'refs/heads/main'
+      )
+    environment: ${{ github.ref_name }}
 
     steps:
       - name: Checkout
