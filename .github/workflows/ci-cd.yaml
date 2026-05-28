@@ -1,14 +1,12 @@
-# .github/workflows/ci-cd.yml
 name: CI/CD Pipeline
 
 on:
   push:
     branches: [main, staging, dev]
   pull_request:
-    branches: [main]
+    branches: [main, staging]
 
 jobs:
-  # ─── CI ───────────────────────────────────────────────────────
   build-and-push:
     name: CI - Build & Push — ${{ matrix.service }}
     runs-on: ubuntu-latest
@@ -16,7 +14,6 @@ jobs:
     strategy:
       matrix:
         include:
-          # Backend services — use cache for faster builds
           - service: api-gateway
             use_cache: true
           - service: user-service
@@ -29,7 +26,6 @@ jobs:
             use_cache: true
           - service: notification-service
             use_cache: true
-          # Frontend — always fresh build, never use cache
           - service: frontend
             use_cache: false
 
@@ -49,9 +45,9 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_USERNAME }}/amazon-clone-${{ matrix.service }}
           tags: |
+            type=sha,prefix=sha-
             type=ref,event=branch
             type=ref,event=pr
-            type=sha,prefix=sha-
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Set up Docker Buildx
@@ -68,17 +64,11 @@ jobs:
           cache-from: ${{ matrix.use_cache && 'type=gha' || '' }}
           cache-to: ${{ matrix.use_cache && 'type=gha,mode=max' || '' }}
 
-  # ─── CD ───────────────────────────────────────────────────────
   deploy:
     name: CD - Deploy to ${{ github.ref_name }}
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
-
-    # Waits for ALL CI matrix jobs to pass
-    # If any single build fails → deploy is skipped entirely
     needs: build-and-push
-
-    # Never deploy on pull requests
     if: github.event_name != 'pull_request'
 
     steps:
@@ -107,17 +97,12 @@ jobs:
           script: |
             cd /opt/amazon-clone
 
-            # Login to Docker Hub
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-            export IMAGE_TAG=sha-${{ steps.vars.outputs.SHA }}
+            # Pass the branch name so compose pulls the right tag
+            export DEPLOY_ENV=${{ github.ref_name }}
             export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
 
-            # Pull latest images from Docker Hub
             docker compose -f docker-compose.prod.yaml pull
-
-            # Restart all containers with new images
             docker compose -f docker-compose.prod.yaml up -d --force-recreate
-
-            # Clean up old images to free disk space
             docker image prune -f
