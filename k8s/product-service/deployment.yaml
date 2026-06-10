@@ -1,0 +1,63 @@
+# k8s/user-service/deployemt.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+  namespace: amazon-clone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      containers:
+        - name: product-service
+          image:  vamsibm36/amazon-clone-product-service:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3002
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: PRODUCT_SERVICE_PORT
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: PRODUCT_SERVICE_MONGO_URI
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: REDIS_URL
+            - name: RABBITMQ_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: RABBITMQ_URL
+          # Uses the /health endpoint your services already expose
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
