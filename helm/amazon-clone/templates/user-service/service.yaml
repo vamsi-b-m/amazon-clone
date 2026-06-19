@@ -1,0 +1,12 @@
+# helm/amazon-clone/templates/user-service.service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace:  {{ .Values.global.namespace }}
+spec:
+  selector:
+    app: user-service
+  ports:
+    - port: {{ .Values.userService.port }}
+      targetPort: {{ .Values.userService.port }}
