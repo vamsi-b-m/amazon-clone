@@ -1,0 +1,40 @@
+# ansible/roles/app/tasks/main.yaml
+---
+- name: Clone Repository
+  git:
+    repo: "{{ github_repo }}"
+    dest: "{{ app_dir }}"
+    version: "{{ github_branch }}"
+    force: yes
+  become_user: ubuntu
+
+- name: Creare .env file
+  template:
+    src: env.j2
+    dest: "{{ app_dir }}/.env"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0600"
+
+- name: Pull latest Docker images
+  shell: docker-compose -f {{ compose_file }} pull
+  args:
+    chdir: "{{ app_dir }}"
+  become_user: ubuntu
+
+- name: Start Application
+  shell: docker-compose -f {{ compose_file }} up -d --force-recreate
+  args:
+    chdir: "{{ app_dir }}"
+  become_user: ubuntu
+
+- name: Verify the containers are running
+  shell: docker-compose -f {{ compose_file }} ps
+  args:
+    chdir: "{{ app_dir }}"
+  become_user: ubuntu
+  register: compose_status
+
+- name: Print container status
+  debug:
+    msg: "{{ compose_status.stdout }}"

@@ -1,0 +1,18 @@
+# ansible/site.yaml
+---
+- name: Configure Amazon Clone Server
+  hosts: "{{ target | default('dev') }}"
+  become: yes
+
+  roles:
+    - common
+    - docker
+    - app
+  
+  post_tasks:
+    - name: Print success message
+      debug:
+        msg: |
+          ✅ Amazon Clone deployed successfully!
+          🌐 Frontend: http://{{ ansible_host }}:3000
+          🔀 API Gateway: http://{{ ansible_host }}:4000

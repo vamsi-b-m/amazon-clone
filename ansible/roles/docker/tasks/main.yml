@@ -1,0 +1,29 @@
+# ansible/roles/docker/tasks/main.yaml
+---
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+
+- name: Enable and Start Docker
+  systemd:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Install Docker Compose
+  get_url: 
+    url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+
+- name: Add ubuntu user to the docker user group
+  user:
+    name: ubuntu
+    groups: docker
+    append: yes
+  
+
+# - name: Print Docker version
+#   debug:
+#     msg: "{{ docker_version.stdout }}"

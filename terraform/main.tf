@@ -128,73 +128,7 @@ resource "aws_instance" "app_server" {
   subnet_id = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.ec2.id]
   key_name = var.key_pair_name
-
-user_data = <<-EOF
-    #!/bin/bash
-    set -e
-
-    apt-get update -y
-    apt-get install -y docker.io git curl
-
-    systemctl enable docker
-    systemctl start docker
-
-    # Install docker compose standalone binary
-    curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
-    -o /usr/local/bin/docker-compose
-
-    chmod +x /usr/local/bin/docker-compose
-
-    usermod -aG docker ubuntu
-
-    docker-compose version
-
-    cd /opt
-
-    git clone https://github.com/vamsi-b-m/amazon-clone.git
-
-    chown -R ubuntu:ubuntu /opt/amazon-clone
-
-    # create env
-    cat > /opt/amazon-clone/.env << 'ENVFILE'
-      DOCKERHUB_USERNAME=vamsibm36
-      DEPLOY_ENV=dev
-      MONGO_PORT=27017
-      MONGO_INITDB_ROOT_USERNAME=admin
-      MONGO_INITDB_ROOT_PASSWORD=amazon123
-      USER_SERVICE_MONGO_URI=mongodb://admin:amazon123@mongo:27017/amazon_users?authSource=admin
-      PRODUCT_SERVICE_MONGO_URI=mongodb://admin:amazon123@mongo:27017/amazon_products?authSource=admin
-      CART_SERVICE_MONGO_URI=mongodb://admin:amazon123@mongo:27017/amazon_carts?authSource=admin
-      ORDER_SERVICE_MONGO_URI=mongodb://admin:amazon123@mongo:27017/amazon_orders?authSource=admin
-      REDIS_PORT=6379
-      REDIS_URL=redis://redis:6379
-      RABBITMQ_PORT_1=5672
-      RABBITMQ_PORT_2=15672
-      RABBITMQ_DEFAULT_USER=admin
-      RABBITMQ_DEFAULT_PASS=amazon123
-      RABBITMQ_URL=amqp://admin:amazon123@rabbitmq:5672
-      JWT_SECRET=super_secret_jwt_key_amazon_clone
-      USER_SERVICE_PORT=3001
-      USER_SERVICE_URL=http://user-service:3001
-      PRODUCT_SERVICE_PORT=3002
-      PRODUCT_SERVICE_URL=http://product-service:3002
-      CART_SERVICE_PORT=3003
-      CART_SERVICE_URL=http://cart-service:3003
-      ORDER_SERVICE_PORT=3004
-      ORDER_SERVICE_URL=http://order-service:3004
-      NOTIFICATION_SERVICE_PORT=3005
-      API_GATEWAY_PORT=4000
-      FRONTEND_PORT=80
-      FRONTEND_BIND_PORT=3000
-    ENVFILE
-
-    cd /opt/amazon-clone
-
-    sudo docker-compose -f docker-compose.prod.yaml up -d
-
-    echo "✅ Amazon Clone setup complete!"
-  EOF
-
+  
   tags = {
     Name    = "${var.project_name}-server"
     Environment = var.environment
