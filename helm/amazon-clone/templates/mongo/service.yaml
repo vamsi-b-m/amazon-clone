@@ -1,0 +1,13 @@
+# helm/amazon-clone/templates/mongo/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: {{ .Values.global.namespace }}
+  namespace: {{ .Values.global.namespace }}
+spec:
+  selector:
+    app: mongo
+  ports:
+    - port: {{ .Values.mongo.port }}
+      targetPort: {{ .Values.mongo.port }}

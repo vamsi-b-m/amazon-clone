@@ -4,6 +4,11 @@ services:
   # ------ Infrastructure ------------------------------------------------------
   mongo:
     image: mongo:7
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     container_name: amazon_mongo
     restart: unless-stopped
     deploy:

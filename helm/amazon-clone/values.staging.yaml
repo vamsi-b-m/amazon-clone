@@ -1,0 +1,16 @@
+# helm/amazon-clone/values.staging.yaml
+image:
+  tag:  staging
+  pullPolicy: Always
+
+userService:
+  replicas: 2
+
+productService:
+  replicas: 2
+
+apiGateway:
+  replicas: 2
+
+frontend:
+  replicas: 2

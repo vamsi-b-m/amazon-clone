@@ -1,0 +1,12 @@
+# k8s/user-service/service
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+  namespace: amazon-clone
+spec:
+  selector:
+    app: product-service
+  ports:
+    - port: 3002
+      targetPort: 3002
