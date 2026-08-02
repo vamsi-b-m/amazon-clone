@@ -1,0 +1,63 @@
+# k8s/user-service/deployemt.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-service
+  namespace: {{ .Values.global.namespace}}
+spec:
+  replicas: {{ .Values.cartService.replicas }}
+  selector:
+    matchLabels:
+      app: cart-service
+  template:
+    metadata:
+      labels:
+        app: cart-service
+    spec:
+      containers:
+        - name: cart-service
+          image:  {{ .Values.image.repository }}/amazon-clone-cart-service:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.cartService.port }}
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: CART_SERVICE_PORT
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: CART_SERVICE_MONGO_URI
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: REDIS_URL
+            - name: RABBITMQ_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: RABBITMQ_URL
+          # Uses the /health endpoint your services already expose
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.cartService.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.cartService.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          resources:
+            requests:
+              memory:  {{ .Values.cartService.resources.requests.memory }}
+              cpu: {{ .Values.cartService.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.cartService.resources.limits.memory }}
+              cpu: {{ .Values.cartService.resources.limits.cpu }}
