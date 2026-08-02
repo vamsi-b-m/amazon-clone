@@ -4,10 +4,7 @@ kind: Ingress
 metadata:
   name: amazon-ingress
   namespace: {{ .Values.global.namespace }}
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: {{ .Values.ingress.className }}
   rules:
     - http:
         paths:

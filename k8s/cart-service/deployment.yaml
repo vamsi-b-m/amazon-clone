@@ -17,7 +17,7 @@ spec:
       containers:
         - name: cart-service
           image:  vamsibm36/amazon-clone-cart-service:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3003
           env:

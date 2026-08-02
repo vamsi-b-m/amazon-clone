@@ -17,7 +17,7 @@ spec:
       containers:
         - name: order-service
           image:  vamsibm36/amazon-clone-notification-service:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3005
           env:

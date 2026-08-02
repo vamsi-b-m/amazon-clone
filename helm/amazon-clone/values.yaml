@@ -7,7 +7,7 @@ global:
 # ------ Image ----------------------------------------------------------------
 image:
   repository: vamsibm36
-  tag: dev
+  tag: latest
   pullPolicy: Never             # Never for kind (local), always for EKS
 
 # ------ Secrets ----------------------------------------------------------------
