@@ -13,7 +13,7 @@ build-images:
 	sh docker-builds.sh
 load-images:
 	sh kind-load-builds.sh
-k8s-install-helm-chart:
-	helm install amazon-clone helm/amazon-clone -f helm/amazon-clone/values.yaml
-k8s-get-pods:
-	kubectl get pods -n amazon-clone
+# k8s-install-helm-chart:
+# 	helm install amazon-clone helm/amazon-clone -f helm/amazon-clone/values.yaml
+# k8s-get-pods:
+# 	kubectl get pods -n amazon-clone

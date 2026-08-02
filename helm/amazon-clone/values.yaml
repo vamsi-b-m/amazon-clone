@@ -23,7 +23,7 @@ mongo:
   replicas: 1
   image: mongo:7
   port: 27017
-  storage: 1Gi
+  storage: "10Gi"
   resources:
     requests:
       memory: "256Mi"
@@ -51,7 +51,7 @@ rabbitmq:
   image: rabbitmq:3-management-alpine
   port: 5672
   managementPort: 15672
-  storage: 1Gi
+  storage: "5Gi"
   resources:
     requests:
       memory: "128Mi"
