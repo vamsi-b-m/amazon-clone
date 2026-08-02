@@ -1,0 +1,150 @@
+# helm/amazon-clone/values.yaml
+
+# ------ Global -----------------------------------------------------------------
+global:
+  namespace: amazon-clone
+
+# ------ Image ----------------------------------------------------------------
+image:
+  repository: vamsibm36
+  tag: latest
+  pullPolicy: Never             # Never for kind (local), always for EKS
+
+# ------ Secrets ----------------------------------------------------------------
+secrets:
+  mongoRootUsername: admin
+  mongoRootPassword: amazon123
+  jwtSecret: super_secret_jwt_key_amazon_clone
+  rabbitmqUser: admin
+  rabbitmqPassword: amazon123
+
+# ------ MongoDB ----------------------------------------------------------------
+mongo:
+  replicas: 1
+  image: mongo:7
+  port: 27017
+  storage: 1Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "1000m"
+
+# ------ Redis ----------------------------------------------------------------
+redis:
+  replicas: 1
+  image: redis:7-alpine
+  port: 6379
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "250m"
+
+# ------ RabbitMQ ----------------------------------------------------------------
+rabbitmq:
+  replicas: 1
+  image: rabbitmq:3-management-alpine
+  port: 5672
+  managementPort: 15672
+  storage: 1Gi
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+# ------ User Service ----------------------------------------------------------------
+userService:
+  replicas: 1
+  port: 3001
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+# ------ Product Service ----------------------------------------------------------------
+productService:
+  replicas: 1
+  port: 3002
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+# ------ Cart Service ----------------------------------------------------------------
+cartService:
+  replicas: 1
+  port: 3003
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+# ------ Order Service ----------------------------------------------------------------
+orderService:
+  replicas: 1
+  port: 3004
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+# ------ Notification Service ----------------------------------------------------------------
+notificationService:
+  replicas: 1
+  port: 3005
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "250m"
+
+# ------ API Gateway ----------------------------------------------------------------
+apiGateway:
+  replicas: 1
+  port: 4000
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+# ------ Frontend ----------------------------------------------------------------
+frontend:
+  replicas: 1
+  port: 80
+  resources:
+    requests:
+      memory: "32Mi"
+      cpu: "50m"
+    limits:
+      memory: "64Mi"
+      cpu: "100m"
+
+# ------ Ingress ----------------------------------------------------------------
+ingress:
+  enabled: true
+  className: nginx

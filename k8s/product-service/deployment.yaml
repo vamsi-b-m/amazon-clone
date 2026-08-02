@@ -17,7 +17,7 @@ spec:
       containers:
         - name: product-service
           image:  vamsibm36/amazon-clone-product-service:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3002
           env:

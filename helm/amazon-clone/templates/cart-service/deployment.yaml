@@ -3,9 +3,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cart-service
-  namespace: amazon-clone
+  namespace: {{ .Values.global.namespace}}
 spec:
-  replicas: 1
+  replicas: {{ .Values.cartService.replicas }}
   selector:
     matchLabels:
       app: cart-service
@@ -16,10 +16,10 @@ spec:
     spec:
       containers:
         - name: cart-service
-          image:  vamsibm36/amazon-clone-cart-service:latest
-          imagePullPolicy: IfNotPresent
+          image:  {{ .Values.image.repository }}/amazon-clone-cart-service:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 3003
+            - containerPort: {{ .Values.cartService.port }}
           env:
             - name: PORT
               valueFrom:
@@ -45,19 +45,19 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 3003
+              port: {{ .Values.cartService.port }}
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /health
-              port: 3003
+              port: {{ .Values.cartService.port }}
             initialDelaySeconds: 15
             periodSeconds: 5
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              memory:  {{ .Values.cartService.resources.requests.memory }}
+              cpu: {{ .Values.cartService.resources.requests.cpu }}
             limits:
-              memory: "256Mi"
-              cpu: "500m"
+              memory: {{ .Values.cartService.resources.limits.memory }}
+              cpu: {{ .Values.cartService.resources.limits.cpu }}

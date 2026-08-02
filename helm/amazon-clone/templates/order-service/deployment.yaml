@@ -1,31 +1,41 @@
-# k8s/user-service/deployemt.yaml
+# k8s/order-service/deployemt.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: notification-service
-  namespace: amazon-clone
+  name: order-service
+  namespace: {{ .Values.global.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.orderService.replicas }}
   selector:
     matchLabels:
-      app: notification-service
+      app: order-service
   template:
     metadata:
       labels:
-        app: notification-service
+        app: order-service
     spec:
       containers:
         - name: order-service
-          image:  vamsibm36/amazon-clone-notification-service:latest
-          imagePullPolicy: IfNotPresent
+          image:  {{ .Values.image.repository }}/amazon-clone-order-service:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 3005
+            - containerPort: {{ .Values.orderService.port }}
           env:
             - name: PORT
               valueFrom:
                 configMapKeyRef:
                   name: amazon-config
-                  key: NOTIFICATION_SERVICE_PORT
+                  key: ORDER_SERVICE_PORT
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: ORDER_SERVICE_MONGO_URI
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: REDIS_URL
             - name: RABBITMQ_URL
               valueFrom:
                 configMapKeyRef:
@@ -35,13 +45,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 3005
+              port: {{ .Values.orderService.port }}
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /health
-              port: 3005
+              port: {{ .Values.orderService.port }}
             initialDelaySeconds: 15
             periodSeconds: 5
           resources:

@@ -17,7 +17,7 @@ spec:
       containers:
         - name: order-service
           image:  vamsibm36/amazon-clone-order-service:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3004
           env:

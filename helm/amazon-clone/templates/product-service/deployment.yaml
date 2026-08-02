@@ -1,36 +1,36 @@
-# k8s/user-service/deployemt.yaml
+# k8s/product-service/deployemt.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cart-service
-  namespace: amazon-clone
+  name: product-service
+  namespace: {{ .Values.global.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.productService.replicas }}
   selector:
     matchLabels:
-      app: cart-service
+      app: product-service
   template:
     metadata:
       labels:
-        app: cart-service
+        app: product-service
     spec:
       containers:
-        - name: cart-service
-          image:  vamsibm36/amazon-clone-cart-service:latest
-          imagePullPolicy: IfNotPresent
+        - name: product-service
+          image:  {{ .Values.image.repository }}/amazon-clone-product-service:{{ .Values.image.tag }}
+          imagePullPolicy: Never
           ports:
-            - containerPort: 3003
+            - containerPort: {{ .Values.productService.port }}
           env:
             - name: PORT
               valueFrom:
                 configMapKeyRef:
                   name: amazon-config
-                  key: CART_SERVICE_PORT
+                  key: PRODUCT_SERVICE_PORT
             - name: MONGO_URI
               valueFrom:
                 configMapKeyRef:
                   name: amazon-config
-                  key: CART_SERVICE_MONGO_URI
+                  key: PRODUCT_SERVICE_MONGO_URI
             - name: REDIS_URL
               valueFrom:
                 configMapKeyRef:
@@ -45,19 +45,19 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 3003
+              port: {{ .Values.productService.port }}
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /health
-              port: 3003
+              port: {{ .Values.productService.port }}
             initialDelaySeconds: 15
             periodSeconds: 5
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: {{ .Values.productService.resources.requests.memory }}
+              cpu: {{ .Values.productService.resources.requests.cpu }}
             limits:
-              memory: "256Mi"
-              cpu: "500m"
+              memory: {{ .Values.productService.resources.limits.memory }}
+              cpu: {{ .Values.productService.resources.limits.cpu }}

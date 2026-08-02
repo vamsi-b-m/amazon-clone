@@ -3,9 +3,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api-gateway
-  namespace:  amazon-clone
+  namespace:  {{ .Values.global.namespace }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.apiGateway.replicas }}
   selector:
     matchLabels:
       app: api-gateway
@@ -14,14 +14,12 @@ spec:
       labels:
         app: api-gateway
     spec:
-      imagePullSecrets:
-        - name: dockerhub-secret
       containers:
         - name: api-gateway
-          image: vamsibm36/amazon-clone-api-gateway:latest
-          imagePullPolicy: IfNotPresent
+          image: {{ .Values.image.repository }}/amazon-clone-api-gateway:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 4000
+            - containerPort: {{ .Values.apiGateway.port }}
           env:
             - name: PORT
               valueFrom:
@@ -61,19 +59,19 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 4000
+              port: {{ .Values.apiGateway.port }}
             initialDelaySeconds: 30
             periodSeconds: 30
           readinessProbe:
             httpGet:
               path: /health
-              port: 4000
+              port: {{ .Values.apiGateway.port }}
             initialDelaySeconds: 15
             periodSeconds: 5
           resources:
             requests:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: {{ .Values.apiGateway.resources.requests.memory }}
+              cpu: {{ .Values.apiGateway.resources.requests.cpu }}
             limits:
-              memory: "256Mi"
-              cpu: "500m"
+              memory: {{ .Values.apiGateway.resources.limits.memory }}
+              cpu: {{ .Values.apiGateway.resources.limits.cpu }}
