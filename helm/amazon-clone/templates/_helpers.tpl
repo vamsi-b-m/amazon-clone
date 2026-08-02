@@ -4,7 +4,6 @@
 Common labels applied to all resources
 */}}
 {{- define "amazon-clone.labels" -}}
-app.kubernetes.io/managed-by: {{ .Release.service }}
 helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 app.kubernetes.io/version: {{ .Chart.AppVersion }}
 {{- end }}
