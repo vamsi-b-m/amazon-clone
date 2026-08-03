@@ -9,10 +9,10 @@ resources:
   - infrastructure/rabbitmq.yaml
   - infrastructure/ingress.yaml
 
-  # - applications/api-gateway.yaml
-  # - applications/frontend.yaml
-  # - applications/user-service.yaml
-  # - applications/product-service.yaml
-  # - applications/cart-service.yaml
-  # - applications/order-service.yaml
-  # - applications/notification-service.yaml
+  - applications/api-gateway.yaml
+  - applications/frontend.yaml
+  - applications/user-service.yaml
+  - applications/product-service.yaml
+  - applications/cart-service.yaml
+  - applications/order-service.yaml
+  - applications/notification-service.yaml
