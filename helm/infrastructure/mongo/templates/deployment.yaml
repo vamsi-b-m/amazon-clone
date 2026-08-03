@@ -1,0 +1,44 @@
+# helm/amazon-clone/templates/mongo/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app:  mongo
+    {{- include "amazon-clone.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.mongo.replicas }}
+  selector: 
+    matchLabels:
+      app:  mongo
+  template:
+    metadata:
+      labels:
+        app:  mongo
+    spec:
+      containers:
+        - name: mongo
+          image:  {{ .Values.mongo.image }}
+          ports:
+            - containerPort: {{ .Values.mongo.port }}
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: amazon-mongo-secret
+                  key:  MONGO_ROOT_USERNAME
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                  name: amazon-mongo-secret
+                  key:  MONGO_ROOT_PASSWORD
+          volumeMounts:
+            - name: mongo-data
+              mountPath:  /data/db
+          resources:
+            {{- toYaml .Values.mongo.resources | nindent 12 }}
+      volumes:
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: mongo-pvc

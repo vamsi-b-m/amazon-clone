@@ -1,0 +1,17 @@
+# helm/amazon-clone/Chart.yaml
+apiVersion: v2
+name: amazon-order-clone
+description: Amazon Clone Microservices Application - Order Service
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - amazon
+  - clone
+  - microservices
+  - helm
+  - kubernetes
+  - ecommerce
+  - order-service
+maintainers:
+  - name: vamsi-b-m

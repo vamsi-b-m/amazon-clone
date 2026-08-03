@@ -1,0 +1,18 @@
+# helm/amazon-clone/values.yaml
+
+# ------ Global -----------------------------------------------------------------
+global:
+  namespace: amazon-clone
+
+# ------ Redis ----------------------------------------------------------------
+redis:
+  replicas: 1
+  image: redis:7-alpine
+  port: 6379
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "250m"

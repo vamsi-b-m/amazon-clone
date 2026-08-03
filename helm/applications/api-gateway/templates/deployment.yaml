@@ -1,0 +1,77 @@
+# k8s/api-gateway/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace:  {{ .Values.global.namespace }}
+spec:
+  replicas: {{ .Values.apiGateway.replicas }}
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: {{ .Values.image.repository }}/amazon-clone-api-gateway:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.apiGateway.port }}
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: API_GATEWAY_PORT
+            - name: USER_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: USER_SERVICE_URL
+            - name: PRODUCT_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: PRODUCT_SERVICE_URL
+            - name: CART_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: CART_SERVICE_URL
+            - name: ORDER_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: ORDER_SERVICE_URL
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: amazon-config
+                  key: REDIS_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: amazon-secret
+                  key: JWT_SECRET
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.apiGateway.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.apiGateway.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: {{ .Values.apiGateway.resources.requests.memory }}
+              cpu: {{ .Values.apiGateway.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.apiGateway.resources.limits.memory }}
+              cpu: {{ .Values.apiGateway.resources.limits.cpu }}

@@ -1,0 +1,17 @@
+# helm/frontend/Chart.yaml
+apiVersion: v2
+name: amazon-clone-ingress
+description: Amazon Clone Microservices Application Ingress
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - amazon
+  - clone
+  - microservices
+  - helm
+  - kubernetes
+  - ecommerce
+  - ingress
+maintainers:
+  - name: vamsi-b-m

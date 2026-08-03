@@ -1,0 +1,17 @@
+# helm/amazon-clone/Chart.yaml
+apiVersion: v2
+name: amazon-clone-cart-service
+description: Amazon Clone Microservices Application - Cart Service
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - amazon
+  - clone
+  - microservices
+  - helm
+  - kubernetes
+  - ecommerce
+  - cart-service
+maintainers:
+  - name: vamsi-b-m

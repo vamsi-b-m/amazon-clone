@@ -1,0 +1,25 @@
+# helm/amazon-clone/values.yaml
+
+# ------ Global -----------------------------------------------------------------
+global:
+  namespace: amazon-clone
+
+# ------ Secrets ----------------------------------------------------------------
+secrets:
+  rabbitmqUser: admin
+  rabbitmqPassword: amazon123
+
+# ------ RabbitMQ ----------------------------------------------------------------
+rabbitmq:
+  replicas: 1
+  image: rabbitmq:3-management-alpine
+  port: 5672
+  managementPort: 15672
+  storage: "5Gi"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
