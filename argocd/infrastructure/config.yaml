@@ -16,7 +16,7 @@ spec:
 
     helm:
       valueFiles:
-        - helm/infrastructure/config/values.yaml
+        - values.yaml
 
   destination:
     server: https://kubernetes.default.svc
