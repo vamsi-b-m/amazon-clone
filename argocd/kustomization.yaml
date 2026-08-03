@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - infrastructure/config.yaml
-  - infrastructure/secret.yaml
+  - infrastructure/secrets.yaml
   - infrastructure/mongo.yaml
   - infrastructure/redis.yaml
   - infrastructure/rabbitmq.yaml

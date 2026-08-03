@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: redis
+  name: amazon-clone
   namespace: argocd
 spec:
   project: default
@@ -13,12 +13,9 @@ spec:
   
   destination:
     server: https://kubernetes.default.svc
-    namespace: amazon-clone
+    namespace: argocd
 
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    
-    syncOptions:
-      - CreateNamespace=true
