@@ -1,0 +1,32 @@
+# ------ Global -----------------------------------------------------------------
+global:
+  namespace: amazon-clone
+
+# ------ Ingress ----------------------------------------------------------------
+ingress:
+  enabled: true
+  className: nginx
+
+# ------ API Gateway ----------------------------------------------------------------
+apiGateway:
+  replicas: 1
+  port: 4000
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+# ------ Frontend ----------------------------------------------------------------
+frontend:
+  replicas: 1
+  port: 80
+  resources:
+    requests:
+      memory: "32Mi"
+      cpu: "50m"
+    limits:
+      memory: "64Mi"
+      cpu: "100m"

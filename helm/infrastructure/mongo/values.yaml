@@ -1,0 +1,24 @@
+# helm/mongo/values.yaml
+
+# ------ Global -----------------------------------------------------------------
+global:
+  namespace: amazon-clone
+
+# ------ Secrets ----------------------------------------------------------------
+secrets:
+  mongoRootUsername: admin
+  mongoRootPassword: amazon123
+
+# ------ MongoDB ----------------------------------------------------------------
+mongo:
+  replicas: 1
+  image: mongo:7
+  port: 27017
+  storage: "10Gi"
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "1000m"

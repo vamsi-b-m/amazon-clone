@@ -1,0 +1,17 @@
+# helm/amazon-clone/Chart.yaml
+apiVersion: v2
+name: amazon-clone-redis
+description: Amazon Clone Microservices Application Redis
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - amazon
+  - clone
+  - microservices
+  - helm
+  - kubernetes
+  - ecommerce
+  - redis
+maintainers:
+  - name: vamsi-b-m
