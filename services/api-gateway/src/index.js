@@ -6,10 +6,35 @@ const rateLimit = require('express-rate-limit');
 const { createClient } = require('redis');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
-require('dotenv').config();
-
+const client = require("prom-client");
 const app = express();
 const PORT = process.env.PORT || 4000;
+require('dotenv').config();
+
+// ─── Prometheus Metrics ───────────────────────────────────────
+
+const register = new client.Registry();
+
+// Collect default Node.js metrics
+client.collectDefaultMetrics({
+  register,
+});
+
+const httpRequestsTotal = new client.Counter({
+  name: "http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route", "status"],
+});
+
+const httpRequestDuration = new client.Histogram({
+  name: "http_request_duration_seconds",
+  help: "Duration of HTTP requests",
+  labelNames: ["method", "route", "status"],
+  buckets: [0.05, 0.1, 0.2, 0.5, 1, 2, 5],
+});
+
+register.registerMetric(httpRequestsTotal);
+register.registerMetric(httpRequestDuration);
 
 // ─── Redis Client ──────────────────────────────────────────────
 let redisClient;
@@ -29,6 +54,37 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], allowedHeaders: ['Content-Type', 'Authorization'] }));
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
+
+app.use((req, res, next) => {
+
+  const start = process.hrtime();
+
+  res.on("finish", () => {
+
+    const diff = process.hrtime(start);
+
+    const duration = diff[0] + diff[1] / 1e9;
+
+    httpRequestsTotal.inc({
+      method: req.method,
+      route: req.route?.path || req.path,
+      status: res.statusCode,
+    });
+
+    httpRequestDuration.observe(
+      {
+        method: req.method,
+        route: req.route?.path || req.path,
+        status: res.statusCode,
+      },
+      duration
+    );
+
+  });
+
+  next();
+
+});
 
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 500, message: { error: 'Too many requests' } });
 app.use(limiter);
@@ -105,6 +161,14 @@ app.get('/health', async (req, res) => {
     status: results[i].status === 'fulfilled' ? 'healthy' : 'unhealthy',
   }));
   res.json({ gateway: 'healthy', timestamp: new Date(), services: statuses });
+});
+
+app.get("/metrics", async (req, res) => {
+
+  res.set("Content-Type", register.contentType);
+
+  res.end(await register.metrics());
+
 });
 
 // ─── User Service Routes ───────────────────────────────────────
