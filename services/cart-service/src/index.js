@@ -2,12 +2,45 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
+const client = require("prom-client");
+
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+
+app.use((req, res, next) => {
+
+  const start = process.hrtime();
+
+  res.on("finish", () => {
+
+    const diff = process.hrtime(start);
+
+    const duration = diff[0] + diff[1] / 1e9;
+
+    httpRequestsTotal.inc({
+      method: req.method,
+      route: req.route?.path || req.path,
+      status: res.statusCode,
+    });
+
+    httpRequestDuration.observe(
+      {
+        method: req.method,
+        route: req.route?.path || req.path,
+        status: res.statusCode,
+      },
+      duration
+    );
+
+  });
+
+  next();
+
+});
 
 const connectDB = async () => {
   try {
@@ -19,6 +52,31 @@ const connectDB = async () => {
   }
 };
 connectDB();
+
+// ─── Prometheus Metrics ───────────────────────────────────────
+
+const register = new client.Registry();
+
+// Collect default Node.js metrics
+client.collectDefaultMetrics({
+  register,
+});
+
+const httpRequestsTotal = new client.Counter({
+  name: "http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route", "status"],
+});
+
+const httpRequestDuration = new client.Histogram({
+  name: "http_request_duration_seconds",
+  help: "Duration of HTTP requests",
+  labelNames: ["method", "route", "status"],
+  buckets: [0.05, 0.1, 0.2, 0.5, 1, 2, 5],
+});
+
+register.registerMetric(httpRequestsTotal);
+register.registerMetric(httpRequestDuration);
 
 // ─── Schema ────────────────────────────────────────────────────
 const cartItemSchema = new mongoose.Schema({
@@ -46,6 +104,14 @@ app.get('/api/cart', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+app.get("/metrics", async (req, res) => {
+
+  res.set("Content-Type", register.contentType);
+
+  res.end(await register.metrics());
+
 });
 
 app.post('/api/cart/items', async (req, res) => {

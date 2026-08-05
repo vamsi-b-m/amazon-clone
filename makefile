@@ -13,6 +13,19 @@ build-images:
 	sh docker-builds.sh
 load-images:
 	sh kind-load-builds.sh
+argocd-installtion:
+	kubectl create ns argocd && \
+	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+argocd-list-pods:
+	sleep 180 && \
+	kubectl get pods -n argocd && \
+argocd-application-setup:
+	kubectl apply -f argocd/app-of-apps.yaml && \
+	sleep 30 & \
+	kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+#	kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode && echo 
+
 # k8s-install-helm-chart:
 # 	kubectl create ns amazon-clone && \
 # 	helm upgrade --install config helm/infrastructure/config -f helm/infrastructure/config/values.yaml && \
