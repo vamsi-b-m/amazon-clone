@@ -9,6 +9,7 @@ const axios = require('axios');
 const client = require("prom-client");
 const app = express();
 const PORT = process.env.PORT || 4000;
+
 require('dotenv').config();
 
 // ─── Prometheus Metrics ───────────────────────────────────────

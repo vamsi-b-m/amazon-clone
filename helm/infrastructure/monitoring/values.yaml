@@ -1,0 +1,17 @@
+kube-prometheus-stack:
+  
+  grafana:
+    enabled: true
+
+  prometheus:
+    service: 
+      type: ClusterIP
+
+  alertmanager:
+    enabled: true
+
+  kubestateMetrics:
+    enabled: true
+
+  nodeExporter:
+    enabled: true
