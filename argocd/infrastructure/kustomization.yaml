@@ -8,3 +8,4 @@ resources:
   - redis.yaml
   - rabbitmq.yaml
   - ingress.yaml
+  - monitoring.yaml
