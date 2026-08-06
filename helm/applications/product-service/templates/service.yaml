@@ -8,5 +8,6 @@ spec:
   selector:
     app: product-service
   ports:
-    - port: {{ .Values.productService.port }}
+    - name: http
+      port: {{ .Values.productService.port }}
       targetPort: {{ .Values.productService.port }}

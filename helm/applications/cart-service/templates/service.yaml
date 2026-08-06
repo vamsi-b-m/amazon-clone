@@ -8,5 +8,6 @@ spec:
   selector:
     app: cart-service
   ports:
-    - port: {{ .Values.cartService.port }}
+    - name: http
+      port: {{ .Values.cartService.port }}
       targetPort: {{ .Values.cartService.port }}
