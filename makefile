@@ -18,7 +18,7 @@ argocd-installtion:
 	kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 argocd-list-pods:
 	sleep 180 && \
-	kubectl get pods -n argocd && \
+	kubectl get pods -n argocd
 argocd-application-setup:
 	kubectl apply -f argocd/app-of-apps.yaml && \
 	sleep 30 & \
