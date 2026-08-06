@@ -8,5 +8,6 @@ spec:
   selector:
     app: notification-service
   ports:
-    - port: {{ .Values.notificationService.port }}
+    - name: http
+      port: {{ .Values.notificationService.port }}
       targetPort: {{ .Values.notificationService.port }}

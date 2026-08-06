@@ -8,5 +8,6 @@ spec:
   selector:
     app: order-service
   ports:
-    - port: {{ .Values.orderService.port }}
+    - name: http
+      port: {{ .Values.orderService.port }}
       targetPort: {{ .Values.orderService.port }}

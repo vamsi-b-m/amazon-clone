@@ -8,5 +8,6 @@ spec:
   selector:
     app: api-gateway
   ports:
-    - port: {{ .Values.apiGateway.port }}
+    - name: http
+      port: {{ .Values.apiGateway.port }}
       targetPort: {{ .Values.apiGateway.port }}
