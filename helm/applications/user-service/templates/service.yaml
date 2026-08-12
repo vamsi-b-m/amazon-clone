@@ -4,6 +4,8 @@ kind: Service
 metadata:
   name: user-service
   namespace:  {{ .Values.global.namespace }}
+  labels:
+    app: user-service
 spec:
   selector:
     app: user-service
