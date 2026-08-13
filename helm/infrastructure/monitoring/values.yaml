@@ -1,6 +1,4 @@
 kube-prometheus-stack:
-  crds:
-    enabled: false
 
   grafana:
     enabled: true
@@ -27,11 +25,25 @@ kube-prometheus-stack:
             options:
               path: /var/lib/grafana/dashboards/amazon-clone
 
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Prometheus
+            type: prometheus
+            access: proxy
+            url: http://monitoring-kube-prometheus-prometheus:9090
+            isDefault: true
+            editable: false
+
   prometheus:
+    enabled: true
+
     service:
       type: ClusterIP
 
     prometheusSpec:
+
       serviceMonitorSelectorNilUsesHelmValues: false
 
       serviceMonitorNamespaceSelector:
