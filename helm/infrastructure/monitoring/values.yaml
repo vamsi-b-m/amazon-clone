@@ -1,11 +1,8 @@
 kube-prometheus-stack:
-  
-  crds:
-    enabled: false
-    
+
   grafana:
     enabled: true
-  
+
     adminUser: admin
     adminPassword: admin
 
@@ -40,24 +37,27 @@ kube-prometheus-stack:
             editable: false
 
   prometheus:
-    service: 
+    enabled: true
+
+    service:
       type: ClusterIP
 
     prometheusSpec:
-    serviceMonitorSelectorNilUsesHelmValues: false
 
-    serviceMonitorNamespaceSelector:
-      matchNames:
-        - amazon-clone
+      serviceMonitorSelectorNilUsesHelmValues: false
 
-    serviceMonitorSelector:
-      matchLabels:
-        app: api-gateway
-        
+      serviceMonitorNamespaceSelector:
+        matchNames:
+          - amazon-clone
+
+      serviceMonitorSelector:
+        matchLabels:
+          app: api-gateway
+
   alertmanager:
     enabled: true
 
-  kubestateMetrics:
+  kubeStateMetrics:
     enabled: true
 
   nodeExporter:
