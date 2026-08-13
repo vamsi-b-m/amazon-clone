@@ -5,55 +5,11 @@ kube-prometheus-stack:
     
   grafana:
     enabled: true
-  
-    adminUser: admin
-    adminPassword: admin
-
-    service:
-      type: ClusterIP
-
-    dashboardsConfigMaps:
-      amazon-clone: api-gateway-dashboard
-
-    dashboardProviders:
-      dashboardproviders.yaml:
-        apiVersion: 1
-        providers:
-          - name: amazon-clone
-            orgId: 1
-            folder: Amazon Clone
-            type: file
-            disableDeletion: false
-            editable: true
-            options:
-              path: /var/lib/grafana/dashboards/amazon-clone
-
-    datasources:
-      datasources.yaml:
-        apiVersion: 1
-        datasources:
-          - name: Prometheus
-            type: prometheus
-            access: proxy
-            url: http://monitoring-kube-prometheus-prometheus:9090
-            isDefault: true
-            editable: false
 
   prometheus:
     service: 
       type: ClusterIP
 
-    prometheusSpec:
-    serviceMonitorSelectorNilUsesHelmValues: false
-
-    serviceMonitorNamespaceSelector:
-      matchNames:
-        - amazon-clone
-
-    serviceMonitorSelector:
-      matchLabels:
-        app: api-gateway
-        
   alertmanager:
     enabled: true
 
