@@ -1,19 +1,37 @@
 kube-prometheus-stack:
-  
+
   crds:
     enabled: false
-    
+
   grafana:
     enabled: true
 
-  prometheus:
-    service: 
+    adminUser: admin
+    adminPassword: admin
+
+    service:
       type: ClusterIP
+
+    dashboardsConfigMaps:
+      amazon-clone: api-gateway-dashboard
+
+  prometheus:
+    service:
+      type: ClusterIP
+
+    prometheusSpec:
+      serviceMonitorSelector:
+        matchLabels:
+          release: monitoring
+
+      serviceMonitorNamespaceSelector:
+        matchNames:
+          - monitoring
 
   alertmanager:
     enabled: true
 
-  kubestateMetrics:
+  kubeStateMetrics:
     enabled: true
 
   nodeExporter:
