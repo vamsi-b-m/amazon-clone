@@ -22,6 +22,8 @@ additionalPrometheusRulesMap:
     groups:
       - name: amazon-clone
         rules:
+
+          # Service has replicas configured but zero available
           - alert: AmazonCloneServiceDown
             expr: |
               kube_deployment_spec_replicas{
