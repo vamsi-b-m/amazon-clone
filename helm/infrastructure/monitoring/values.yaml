@@ -23,13 +23,21 @@ additionalPrometheusRulesMap:
       - name: amazon-clone
         rules:
           - alert: AmazonCloneServiceDown
-            expr: up{namespace="amazon-clone"} == 0
+            expr: |
+              kube_deployment_spec_replicas{
+                namespace="amazon-clone"
+              } > 0
+              and
+              kube_deployment_status_replicas_available{
+                namespace="amazon-clone"
+              } == 0
             for: 2m
             labels:
               severity: critical
+              service: "{{ $labels.deployment }}"
             annotations:
               summary: "Amazon Clone service is down"
-              description: "Service {{ $labels.service }} has been down for more than 2 minutes."
+              description: "Service {{ $labels.deployment }} has no available replicas for more than 2 minutes."
 
           - alert: AmazonClonePodRestarting
             expr: increase(kube_pod_container_status_restarts_total{namespace="amazon-clone"}[10m]) > 3
