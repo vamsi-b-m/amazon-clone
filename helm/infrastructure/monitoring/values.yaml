@@ -1,20 +1,77 @@
 kube-prometheus-stack:
-  
   crds:
     enabled: false
-    
+
   grafana:
     enabled: true
 
   prometheus:
-    service: 
+    service:
       type: ClusterIP
 
   alertmanager:
     enabled: true
 
-  kubestateMetrics:
+  kubeStateMetrics:
     enabled: true
 
   nodeExporter:
     enabled: true
+
+  additionalPrometheusRulesMap:
+    amazon-clone-application-alerts:
+      groups:
+        - name: amazon-clone-application
+          rules:
+
+            - alert: ServiceDown
+              expr: up{service=~".*"} == 0
+              for: 2m
+              labels:
+                severity: critical
+              annotations:
+                summary: "Service {{ $labels.service }} is down"
+                description: "The service {{ $labels.service }} has been unavailable for more than 2 minutes."
+
+            - alert: HighErrorRate
+              expr: |
+                (
+                  sum by (service) (
+                    rate(http_requests_total{status=~"5.."}[5m])
+                  )
+                  /
+                  sum by (service) (
+                    rate(http_requests_total[5m])
+                  )
+                ) > 0.05
+              for: 5m
+              labels:
+                severity: warning
+              annotations:
+                summary: "High error rate on {{ $labels.service }}"
+                description: "More than 5% of HTTP requests are returning 5xx responses for the last 5 minutes."
+
+            - alert: HighLatency
+              expr: |
+                histogram_quantile(
+                  0.95,
+                  sum by (service, le) (
+                    rate(http_request_duration_seconds_bucket[5m])
+                  )
+                ) > 1
+              for: 5m
+              labels:
+                severity: warning
+              annotations:
+                summary: "High latency on {{ $labels.service }}"
+                description: "The p95 HTTP request latency has been above 1 second for more than 5 minutes."
+
+            - alert: PodCrashLooping
+              expr: |
+                increase(kube_pod_container_status_restarts_total[15m]) > 3
+              for: 5m
+              labels:
+                severity: critical
+              annotations:
+                summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is restarting"
+                description: "Container {{ $labels.container }} in pod {{ $labels.pod }} has restarted more than 3 times in the last 15 minutes."
