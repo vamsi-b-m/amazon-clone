@@ -12,21 +12,48 @@ kube-prometheus-stack:
   alertmanager:
     enabled: true
 
-  kubeStateMetrics:
+  kubestateMetrics:
     enabled: true
 
   nodeExporter:
     enabled: true
 
+  additionalPrometheusRulesMap:
+    amazon-clone-alerts:
+      groups:
+        - name: amazon-clone
+          rules:
 
-alerting:
-  enabled: true
+            - alert: AmazonCloneServiceDown
+              expr: up{namespace="amazon-clone"} == 0
+              for: 2m
+              labels:
+                severity: critical
+              annotations:
+                summary: "Amazon Clone service is down"
+                description: "Service {{ $labels.service }} has been down for more than 2 minutes."
 
-  rules:
-    - name: amazon-clone-api-gateway-down
-      expr: |
-        up{service="api-gateway"} == 0
-      for: 2m
-      severity: critical
-      summary: "API Gateway is down"
-      description: "The Amazon Clone API Gateway has been unavailable for more than 2 minutes."
+            - alert: AmazonClonePodRestarting
+              expr: increase(kube_pod_container_status_restarts_total{namespace="amazon-clone"}[10m]) > 3
+              for: 5m
+              labels:
+                severity: warning
+              annotations:
+                summary: "Amazon Clone pod is restarting"
+                description: "Container {{ $labels.container }} in pod {{ $labels.pod }} restarted more than 3 times in 10 minutes."
+
+            - alert: AmazonCloneHighCPU
+              expr: |
+                sum by (pod) (
+                  rate(container_cpu_usage_seconds_total{
+                    namespace="amazon-clone",
+                    container!="",
+                    container!="POD"
+                  }[5m])
+                ) > 0.8
+              for: 5m
+              labels:
+                severity: warning
+              annotations:
+                summary: "Amazon Clone pod has high CPU"
+                description: "Pod {{ $labels.pod }} has been using more than 0.8 CPU cores for 5 minutes."
