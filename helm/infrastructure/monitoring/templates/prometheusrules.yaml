@@ -1,0 +1,23 @@
+{{- if .Values.alerting.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: amazon-clone-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: amazon-clone
+      rules:
+        {{- range .Values.alerting.rules }}
+        - alert: {{ .name }}
+          expr: {{ .expr | quote }}
+          for: {{ .for }}
+          labels:
+            severity: {{ .severity }}
+          annotations:
+            summary: {{ .summary | quote }}
+            description: {{ .description | quote }}
+        {{- end }}
+{{- end }}
