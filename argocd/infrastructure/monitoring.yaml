@@ -8,10 +8,18 @@ metadata:
 spec:
   project: default
 
-  source:
-    repoURL: https://github.com/vamsi-b-m/amazon-clone.git
-    targetRevision: dev
-    path: helm/infrastructure/monitoring
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 77.6.2
+
+      helm:
+        valueFiles:
+          - $values/helm/infrastructure/monitoring/values.yaml
+
+    - repoURL: https://github.com/vamsi-b-m/amazon-clone.git
+      targetRevision: dev
+      ref: values
 
   destination:
     server: https://kubernetes.default.svc
@@ -24,4 +32,3 @@ spec:
 
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true
