@@ -6,6 +6,7 @@ resources:
   - secrets.yaml
   - mongo.yaml
   - redis.yaml
+  - loki.yaml
   - rabbitmq.yaml
   - ingress.yaml
   - monitoring.yaml
