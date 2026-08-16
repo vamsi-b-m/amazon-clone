@@ -8,6 +8,7 @@ resources:
   - redis.yaml
   - loki.yaml
   - alloy.yaml
+  - tempo.yaml
   - rabbitmq.yaml
   - ingress.yaml
   - monitoring.yaml
