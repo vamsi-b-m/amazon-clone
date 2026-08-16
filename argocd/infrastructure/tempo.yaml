@@ -35,7 +35,6 @@ spec:
           accessModes:
             - ReadWriteOnce
           size: 10Gi
-          storageClassName: local-path
   
   destination:
     server: https://kubernetes.default.svc
