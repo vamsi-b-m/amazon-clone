@@ -35,7 +35,7 @@ spec:
                 }
               }
 
-              disovery.relabel "pod_logs" {
+              discovery.relabel "pod_logs" {
                 targets = discovery.kubernetes.pods.targets
 
                 rule = {
@@ -45,7 +45,7 @@ spec:
               }
 
               loki.source.kubernetes "pods" {
-                targets    = discovery.relabel.pod_logs.targets
+                targets    = discovery.relabel.pod_logs.output
                 forward_to = [loki.write.default.receiver]
               }
 
