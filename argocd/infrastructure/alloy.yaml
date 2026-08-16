@@ -35,8 +35,17 @@ spec:
                 }
               }
 
+              disovery.relabel "pod_logs" {
+                targets = discovery.kubernetes.pods.targets
+
+                rule = {
+                  source_labels = ["__meta_kubernetes_pod_label_app"]
+                  target_label = "app"
+                }
+              }
+
               loki.source.kubernetes "pods" {
-                targets    = discovery.kubernetes.pods.targets
+                targets    = discovery.relabel.pod_logs.targets
                 forward_to = [loki.write.default.receiver]
               }
 
