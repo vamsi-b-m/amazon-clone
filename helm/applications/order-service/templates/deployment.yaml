@@ -41,6 +41,10 @@ spec:
                 configMapKeyRef:
                   name: amazon-config
                   key: RABBITMQ_URL
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://tempo.monitoring.svc.cluster.local:4317"
+            - name: OTEL_SERVICE_NAME
+              value: "order-service"
           # Uses the /health endpoint your services already expose
           livenessProbe:
             httpGet:

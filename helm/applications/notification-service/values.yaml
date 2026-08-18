@@ -7,7 +7,7 @@ global:
 # ------ Image ----------------------------------------------------------------
 image:
   repository: vamsibm36
-  tag: 1.0.0
+  tag: 2.1.0
   pullPolicy: Never             # Never for kind (local), always for EKS
 
 # ------ Notification Service ----------------------------------------------------------------
