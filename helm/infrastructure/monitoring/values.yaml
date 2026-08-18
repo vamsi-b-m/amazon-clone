@@ -16,6 +16,9 @@ prometheus:
 alertmanager:
   enabled: true
 
+alerting:
+  enabled: true
+
 kubeStateMetrics:
   enabled: true
 
