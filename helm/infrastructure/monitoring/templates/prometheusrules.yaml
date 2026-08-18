@@ -10,7 +10,8 @@ spec:
   groups:
     - name: amazon-clone
       rules:
-        {{- range .Values.alerting.rules }}
+        {{- $alerting := .Values.alerting | default dict }}
+        {{- if $alerting.enabled }}
         - alert: {{ .name }}
           expr: {{ .expr | quote }}
           for: {{ .for }}
