@@ -3,11 +3,6 @@ crds:
 
 grafana:
   enabled: true
-  sidecar:
-    dashboards:
-      enabled: true
-      label: grafana_dashboard
-      labelValue: "1"
 
 prometheus:
   service:
