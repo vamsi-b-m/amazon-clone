@@ -8,10 +8,10 @@ metadata:
 spec:
   project: default
 
-  source:
-    repoURL: https://github.com/vamsi-b-m/amazon-clone.git
-    targetRevision: dev
-    path: helm/infrastructure/monitoring
+  sources:
+    - repoURL: https://github.com/vamsi-b-m/amazon-clone.git
+      targetRevision: dev
+      path: helm/infrastructure/monitoring
 
   destination:
     server: https://kubernetes.default.svc
