@@ -1,29 +1,89 @@
 {
-  "title": "Amazon Clone - Dependencies",
-  "uid": "amazon-clone-dependencies",
-  "timezone": "browser",
-  "schemaVersion": 39,
-  "version": 1,
-  "refresh": "10s",
-  "tags": [
-    "amazon-clone",
-    "dependencies"
-  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "graphTooltip": 1,
   "panels": [
     {
       "id": 1,
-      "type": "timeseries",
-      "title": "Dependency CPU Usage",
+      "type": "stat",
+      "title": "MongoDB Pod",
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 5,
+        "w": 8,
         "x": 0,
         "y": 0
       },
       "targets": [
         {
+          "expr": "sum(kube_pod_status_ready{namespace=\"amazon-clone\",pod=~\"mongo-.*\",condition=\"true\"})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Redis Pod",
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "sum(kube_pod_status_ready{namespace=\"amazon-clone\",pod=~\"redis-.*\",condition=\"true\"})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "RabbitMQ Pod",
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "sum(kube_pod_status_ready{namespace=\"amazon-clone\",pod=~\"rabbitmq-.*\",condition=\"true\"})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Dependency CPU",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "targets": [
+        {
           "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"amazon-clone\",pod=~\"mongo-.*|redis-.*|rabbitmq-.*\",container!=\"\",container!=\"POD\"}[5m]))",
-          "legendFormat": "{{pod}}"
+          "legendFormat": "{{pod}}",
+          "refId": "A"
         }
       ],
       "fieldConfig": {
@@ -34,19 +94,20 @@
       }
     },
     {
-      "id": 2,
+      "id": 5,
       "type": "timeseries",
-      "title": "Dependency Memory Usage",
+      "title": "Dependency Memory",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 0
+        "y": 5
       },
       "targets": [
         {
           "expr": "sum by (pod) (container_memory_working_set_bytes{namespace=\"amazon-clone\",pod=~\"mongo-.*|redis-.*|rabbitmq-.*\",container!=\"\",container!=\"POD\"})",
-          "legendFormat": "{{pod}}"
+          "legendFormat": "{{pod}}",
+          "refId": "A"
         }
       ],
       "fieldConfig": {
@@ -57,52 +118,144 @@
       }
     },
     {
-      "id": 3,
+      "id": 6,
       "type": "timeseries",
       "title": "Dependency Restarts",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 13
       },
       "targets": [
         {
-          "expr": "sum by (pod) (kube_pod_container_status_restarts_total{namespace=\"amazon-clone\",pod=~\"mongo-.*|redis-.*|rabbitmq-.*\"})",
-          "legendFormat": "{{pod}}"
+          "expr": "sum by (pod) (increase(kube_pod_container_status_restarts_total{namespace=\"amazon-clone\",pod=~\"mongo-.*|redis-.*|rabbitmq-.*\"}[1h]))",
+          "legendFormat": "{{pod}}",
+          "refId": "A"
         }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short"
-        },
-        "overrides": []
-      }
+      ]
     },
     {
-      "id": 4,
+      "id": 7,
       "type": "timeseries",
       "title": "Dependency Availability",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 8
+        "y": 13
       },
       "targets": [
         {
           "expr": "kube_pod_status_ready{namespace=\"amazon-clone\",pod=~\"mongo-.*|redis-.*|rabbitmq-.*\",condition=\"true\"}",
-          "legendFormat": "{{pod}}"
+          "legendFormat": "{{pod}}",
+          "refId": "A"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
           "min": 0,
           "max": 1
         },
         "overrides": []
       }
+    },
+    {
+      "id": 8,
+      "type": "logs",
+      "title": "MongoDB Logs",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "Loki"
+      },
+      "targets": [
+        {
+          "expr": "{namespace=\"amazon-clone\",pod=~\"mongo-.*\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "wrapLines": true,
+        "enableLogDetails": true
+      }
+    },
+    {
+      "id": 9,
+      "type": "logs",
+      "title": "Redis Logs",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "Loki"
+      },
+      "targets": [
+        {
+          "expr": "{namespace=\"amazon-clone\",pod=~\"redis-.*\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "wrapLines": true,
+        "enableLogDetails": true
+      }
+    },
+    {
+      "id": 10,
+      "type": "logs",
+      "title": "RabbitMQ Logs",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "Loki"
+      },
+      "targets": [
+        {
+          "expr": "{namespace=\"amazon-clone\",pod=~\"rabbitmq-.*\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "wrapLines": true,
+        "enableLogDetails": true
+      }
     }
-  ]
+  ],
+  "schemaVersion": 39,
+  "tags": [
+    "amazon-clone",
+    "dependencies",
+    "mongo",
+    "redis",
+    "rabbitmq"
+  ],
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "Amazon Clone - Dependencies",
+  "uid": "amazon-clone-dependencies",
+  "version": 1
 }
