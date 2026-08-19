@@ -16,340 +16,244 @@
     ]
   },
   "editable": true,
-  "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": null,
-  "links": [],
   "panels": [
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "red",
-                  "text": "DOWN"
-                },
-                "1": {
-                  "color": "green",
-                  "text": "HEALTHY"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
+      "id": 1,
+      "type": "stat",
+      "title": "MongoDB Pod",
       "gridPos": {
-        "h": 8,
+        "h": 5,
         "w": 8,
         "x": 0,
         "y": 0
       },
-      "id": 1,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
       "targets": [
         {
-          "expr": "max(kube_deployment_status_replicas_available{namespace=\"$namespace\",deployment=\"mongo\"})",
-          "legendFormat": "MongoDB",
+          "expr": "sum(kube_pod_status_ready{namespace=\"amazon-clone\",pod=~\"mongo-.*\",condition=\"true\"})",
           "refId": "A"
         }
-      ],
-      "title": "MongoDB",
-      "type": "stat"
+      ]
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "red",
-                  "text": "DOWN"
-                },
-                "1": {
-                  "color": "green",
-                  "text": "HEALTHY"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
+      "id": 2,
+      "type": "stat",
+      "title": "Redis Pod",
       "gridPos": {
-        "h": 8,
+        "h": 5,
         "w": 8,
         "x": 8,
         "y": 0
       },
-      "id": 2,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
       "targets": [
         {
-          "expr": "max(kube_deployment_status_replicas_available{namespace=\"$namespace\",deployment=\"redis\"})",
-          "legendFormat": "Redis",
+          "expr": "sum(kube_pod_status_ready{namespace=\"amazon-clone\",pod=~\"redis-.*\",condition=\"true\"})",
           "refId": "A"
         }
-      ],
-      "title": "Redis",
-      "type": "stat"
+      ]
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "red",
-                  "text": "DOWN"
-                },
-                "1": {
-                  "color": "green",
-                  "text": "HEALTHY"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
+      "id": 3,
+      "type": "stat",
+      "title": "RabbitMQ Pod",
       "gridPos": {
-        "h": 8,
+        "h": 5,
         "w": 8,
         "x": 16,
         "y": 0
       },
-      "id": 3,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
       "targets": [
         {
-          "expr": "max(kube_deployment_status_replicas_available{namespace=\"$namespace\",deployment=\"rabbitmq\"})",
-          "legendFormat": "RabbitMQ",
+          "expr": "sum(kube_pod_status_ready{namespace=\"amazon-clone\",pod=~\"rabbitmq-.*\",condition=\"true\"})",
           "refId": "A"
         }
-      ],
-      "title": "RabbitMQ",
-      "type": "stat"
+      ]
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short"
-        },
-        "overrides": []
-      },
+      "id": 4,
+      "type": "timeseries",
+      "title": "Dependency CPU",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 8
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "y": 5
       },
       "targets": [
         {
-          "expr": "kube_deployment_status_replicas_available{namespace=\"$namespace\",deployment=~\"mongo|redis|rabbitmq\"}",
-          "legendFormat": "{{deployment}}",
+          "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"amazon-clone\",pod=~\"mongo-.*|redis-.*|rabbitmq-.*\",container!=\"\",container!=\"POD\"}[5m]))",
+          "legendFormat": "{{pod}}",
           "refId": "A"
         }
       ],
-      "title": "Available Dependency Replicas",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
       "fieldConfig": {
         "defaults": {
-          "unit": "short"
+          "unit": "cores"
         },
         "overrides": []
-      },
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Dependency Memory",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 8
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "displayMode": "table",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
+        "y": 5
       },
       "targets": [
         {
-          "expr": "kube_deployment_status_replicas_unavailable{namespace=\"$namespace\",deployment=~\"mongo|redis|rabbitmq\"}",
-          "legendFormat": "{{deployment}}",
+          "expr": "sum by (pod) (container_memory_working_set_bytes{namespace=\"amazon-clone\",pod=~\"mongo-.*|redis-.*|rabbitmq-.*\",container!=\"\",container!=\"POD\"})",
+          "legendFormat": "{{pod}}",
           "refId": "A"
         }
       ],
-      "title": "Unavailable Dependency Replicas",
-      "type": "timeseries"
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Dependency Restarts",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "targets": [
+        {
+          "expr": "sum by (pod) (increase(kube_pod_container_status_restarts_total{namespace=\"amazon-clone\",pod=~\"mongo-.*|redis-.*|rabbitmq-.*\"}[1h]))",
+          "legendFormat": "{{pod}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Dependency Availability",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "targets": [
+        {
+          "expr": "kube_pod_status_ready{namespace=\"amazon-clone\",pod=~\"mongo-.*|redis-.*|rabbitmq-.*\",condition=\"true\"}",
+          "legendFormat": "{{pod}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 1
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 8,
+      "type": "logs",
+      "title": "MongoDB Logs",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "Loki"
+      },
+      "targets": [
+        {
+          "expr": "{namespace=\"amazon-clone\",pod=~\"mongo-.*\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "wrapLines": true,
+        "enableLogDetails": true
+      }
+    },
+    {
+      "id": 9,
+      "type": "logs",
+      "title": "Redis Logs",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "Loki"
+      },
+      "targets": [
+        {
+          "expr": "{namespace=\"amazon-clone\",pod=~\"redis-.*\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "wrapLines": true,
+        "enableLogDetails": true
+      }
+    },
+    {
+      "id": 10,
+      "type": "logs",
+      "title": "RabbitMQ Logs",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "Loki"
+      },
+      "targets": [
+        {
+          "expr": "{namespace=\"amazon-clone\",pod=~\"rabbitmq-.*\"}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "wrapLines": true,
+        "enableLogDetails": true
+      }
     }
   ],
-  "refresh": "10s",
   "schemaVersion": 39,
-  "style": "dark",
   "tags": [
     "amazon-clone",
     "dependencies",
-    "kubernetes"
+    "mongo",
+    "redis",
+    "rabbitmq"
   ],
-  "templating": {
-    "list": [
-      {
-        "name": "namespace",
-        "label": "Namespace",
-        "type": "custom",
-        "hide": 0,
-        "includeAll": false,
-        "multi": false,
-        "query": "amazon-clone",
-        "current": {
-          "text": "amazon-clone",
-          "value": "amazon-clone"
-        }
-      }
-    ]
-  },
   "time": {
     "from": "now-1h",
     "to": "now"
   },
-  "timepicker": {},
   "timezone": "browser",
   "title": "Amazon Clone - Dependencies",
   "uid": "amazon-clone-dependencies",
