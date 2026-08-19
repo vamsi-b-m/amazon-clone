@@ -4,4 +4,4 @@ COPY package*.json ./
 RUN npm install --production
 COPY . .
 EXPOSE 3004
-CMD ["node", "src/index.js"]
+CMD ["node", "-r", "./src/tracing.js", "src/index.js"]
