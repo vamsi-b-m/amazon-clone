@@ -3,11 +3,76 @@ crds:
 
 grafana:
   enabled: true
+
+  defaultDashboardsEnabled: true
+
+  admin:
+    existingSecret: monitoring-grafana
+    userKey: admin-user
+    passwordKey: admin-password
+
+  service:
+    type: ClusterIP
+    port: 80
+
   sidecar:
     dashboards:
       enabled: true
       label: grafana_dashboard
       labelValue: "1"
+      searchNamespace: ALL
+      folder: /tmp/dashboards
+
+    datasources:
+      enabled: true
+      label: grafana_datasource
+      labelValue: "1"
+      searchNamespace: ALL
+
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki.monitoring.svc.cluster.local:3100
+      isDefault: false
+      editable: false
+
+    - name: Tempo
+      type: tempo
+      access: proxy
+      url: http://tempo.monitoring.svc.cluster.local:3200
+      isDefault: false
+      editable: false
+      jsonData:
+        tracesToLogsV2:
+          datasourceUid: Loki
+          spanStartTimeShift: "-5m"
+          spanEndTimeShift: "5m"
+          tags:
+            - key: service.name
+              value: service_name
+        tracesToMetrics:
+          datasourceUid: Prometheus
+          spanAttributes:
+            - key: service.name
+              value: service
+        serviceMap:
+          datasourceUid: Prometheus
+        nodeGraph:
+          enabled: true
+
+  grafana.ini:
+    server:
+      root_url: "%(protocol)s://%(domain)s/"
+
+    users:
+      allow_sign_up: false
+
+    dashboards:
+      default_home_dashboard_path: /var/lib/grafana/dashboards/amazon-clone/amazon-clone-services.json
+
+    unified_alerting:
+      enabled: true
 
 prometheus:
   service:

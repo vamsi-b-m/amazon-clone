@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: amazon-clone-grafana-dashboards
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  amazon-clone-overview.json: |
+{{ .Files.Get "dashboards/amazon-clone-overview.json" | indent 4 }}
+
+  amazon-clone-dependencies.json: |
+{{ .Files.Get "dashboards/amazon-clone-dependencies.json" | indent 4 }}
+
+  amazon-clone-services.json: |
+{{ .Files.Get "dashboards/amazon-clone-services.json" | indent 4 }}
+
+  amazon-clone-kubernetes.json: |
+{{ .Files.Get "dashboards/amazon-clone-kubernetes.json" | indent 4 }}
