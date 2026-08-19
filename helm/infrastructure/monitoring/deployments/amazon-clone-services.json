@@ -16,321 +16,392 @@
     ]
   },
   "editable": true,
+  "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
+  "id": null,
+  "links": [],
   "panels": [
     {
-      "type": "row",
-      "title": "RED Metrics",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
       "gridPos": {
-        "h": 1,
-        "w": 24,
+        "h": 8,
+        "w": 12,
         "x": 0,
         "y": 0
       },
-      "collapsed": false
-    },
-    {
       "id": 1,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{namespace=\"amazon-clone\",service=~\"$service\"}[5m])) by (service)",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
       "title": "Request Rate",
-      "type": "timeseries",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 0,
-        "y": 1
+        "x": 12,
+        "y": 0
       },
-      "targets": [
-        {
-          "expr": "sum(rate(http_requests_total{service=\"$service\"}[5m]))",
-          "legendFormat": "requests/sec"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "reqps"
-        }
-      }
-    },
-    {
       "id": 2,
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "100 * sum(rate(http_requests_total{namespace=\"amazon-clone\",service=~\"$service\",status=~\"5..\"}[5m])) / clamp_min(sum(rate(http_requests_total{namespace=\"amazon-clone\",service=~\"$service\"}[5m])), 0.001)",
+          "legendFormat": "5xx Error Rate",
+          "refId": "A"
+        }
+      ],
       "title": "Error Rate",
-      "type": "timeseries",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 3
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 12,
-        "y": 1
+        "x": 0,
+        "y": 8
       },
-      "targets": [
-        {
-          "expr": "sum(rate(http_requests_total{service=\"$service\",status=~\"5..\"}[5m])) / sum(rate(http_requests_total{service=\"$service\"}[5m]))",
-          "legendFormat": "5xx error rate"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit"
-        }
-      }
-    },
-    {
       "id": 3,
-      "title": "Request Latency - P95",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 9
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"$service\"}[5m])) by (le))",
-          "legendFormat": "p95"
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{namespace=\"amazon-clone\",service=~\"$service\"}[5m])) by (le, service))",
+          "legendFormat": "{{service}} p95",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{namespace=\"amazon-clone\",service=~\"$service\"}[5m])) by (le, service))",
+          "legendFormat": "{{service}} p50",
+          "refId": "B"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s"
-        }
-      }
+      "title": "Request Latency",
+      "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 3
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
       "id": 4,
-      "title": "Request Latency - P99",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 9
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto"
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service=\"$service\"}[5m])) by (le))",
-          "legendFormat": "p99"
+          "expr": "sum(kube_pod_container_status_restarts_total{namespace=\"amazon-clone\",container=~\"$service\"}) by (container)",
+          "legendFormat": "{{container}}",
+          "refId": "A"
         }
       ],
+      "title": "Container Restarts",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
       "fieldConfig": {
         "defaults": {
-          "unit": "s"
-        }
-      }
-    },
-    {
-      "type": "row",
-      "title": "Kubernetes Resources",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 17
+          "unit": "percent"
+        },
+        "overrides": []
       },
-      "collapsed": false
-    },
-    {
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
       "id": 5,
-      "title": "CPU Usage",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 18
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"amazon-clone\",container=\"$service\",container!=\"POD\"}[5m]))",
-          "legendFormat": "CPU"
+          "expr": "100 * sum(rate(container_cpu_usage_seconds_total{namespace=\"amazon-clone\",container=~\"$service\"}[5m])) by (container) / clamp_min(sum(kube_pod_container_resource_requests{namespace=\"amazon-clone\",container=~\"$service\",resource=\"cpu\"}) by (container), 0.001)",
+          "legendFormat": "{{container}}",
+          "refId": "A"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "cores"
-        }
-      }
+      "title": "CPU Usage vs Request",
+      "type": "timeseries"
     },
     {
-      "id": 6,
-      "title": "Memory Usage",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 18
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
       },
-      "targets": [
-        {
-          "expr": "sum(container_memory_working_set_bytes{namespace=\"amazon-clone\",container=\"$service\",container!=\"POD\"})",
-          "legendFormat": "Memory"
-        }
-      ],
       "fieldConfig": {
         "defaults": {
           "unit": "bytes"
-        }
-      }
-    },
-    {
-      "id": 7,
-      "title": "Pod Restarts",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 26
+        },
+        "overrides": []
       },
-      "targets": [
-        {
-          "expr": "sum(kube_pod_container_status_restarts_total{namespace=\"amazon-clone\",container=\"$service\"})",
-          "legendFormat": "restarts"
-        }
-      ]
-    },
-    {
-      "id": 8,
-      "title": "Running Pods",
-      "type": "stat",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 26
+        "y": 16
       },
-      "targets": [
-        {
-          "expr": "count(kube_pod_info{namespace=\"amazon-clone\",pod=~\"$service.*\"})",
-          "legendFormat": "pods"
+      "id": 6,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
         }
-      ]
-    },
-    {
-      "type": "row",
-      "title": "Logs",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 34
-      },
-      "collapsed": false
-    },
-    {
-      "id": 9,
-      "title": "Application Logs",
-      "type": "logs",
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 35
-      },
-      "datasource": {
-        "type": "loki",
-        "uid": "Loki"
       },
       "targets": [
         {
-          "expr": "{namespace=\"amazon-clone\",app=\"$service\"}",
-          "queryType": "range",
+          "expr": "sum(container_memory_working_set_bytes{namespace=\"amazon-clone\",container=~\"$service\"}) by (container)",
+          "legendFormat": "{{container}}",
           "refId": "A"
         }
       ],
-      "options": {
-        "showTime": true,
-        "showLabels": true,
-        "showCommonLabels": false,
-        "wrapLines": true,
-        "prettifyLogMessage": false,
-        "enableLogDetails": true
-      }
+      "title": "Memory Usage",
+      "type": "timeseries"
     },
     {
-      "type": "row",
-      "title": "Tracing",
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 45
-      },
-      "collapsed": false
-    },
-    {
-      "id": 10,
-      "title": "Distributed Traces",
-      "type": "traces",
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 46
-      },
       "datasource": {
-        "type": "tempo",
-        "uid": "Tempo"
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "text": "DOWN"
+                },
+                "1": {
+                  "text": "UP"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 7,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
       },
       "targets": [
         {
-          "query": "{ .resource.service.name = \"$service\" }",
-          "queryType": "traceql",
+          "expr": "max(up{namespace=\"amazon-clone\",service=~\"$service\"}) by (service)",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{service}}",
           "refId": "A"
         }
-      ]
+      ],
+      "title": "Service Availability",
+      "type": "stat"
     }
   ],
+  "refresh": "30s",
   "schemaVersion": 39,
   "tags": [
     "amazon-clone",
-    "microservices",
-    "observability"
+    "services",
+    "prometheus",
+    "kubernetes"
   ],
   "templating": {
     "list": [
       {
-        "name": "service",
-        "label": "Service",
-        "type": "custom",
-        "query": "api-gateway,user-service,product-service,cart-service,order-service,notification-service",
+        "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "api-gateway",
-          "value": "api-gateway"
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
         },
-        "options": [
-          {
-            "selected": true,
-            "text": "api-gateway",
-            "value": "api-gateway"
-          },
-          {
-            "selected": false,
-            "text": "user-service",
-            "value": "user-service"
-          },
-          {
-            "selected": false,
-            "text": "product-service",
-            "value": "product-service"
-          },
-          {
-            "selected": false,
-            "text": "cart-service",
-            "value": "cart-service"
-          },
-          {
-            "selected": false,
-            "text": "order-service",
-            "value": "order-service"
-          },
-          {
-            "selected": false,
-            "text": "notification-service",
-            "value": "notification-service"
-          }
-        ]
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(up{namespace=\"amazon-clone\"}, service)",
+        "includeAll": true,
+        "label": "Service",
+        "multi": true,
+        "name": "service",
+        "options": [],
+        "query": {
+          "query": "label_values(up{namespace=\"amazon-clone\"}, service)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "sort": 1,
+        "type": "query"
       }
     ]
   },
@@ -338,8 +409,9 @@
     "from": "now-1h",
     "to": "now"
   },
-  "timezone": "browser",
+  "timepicker": {},
+  "timezone": "",
   "title": "Amazon Clone - Services",
   "uid": "amazon-clone-services",
-  "version": 1
+  "version": 2
 }

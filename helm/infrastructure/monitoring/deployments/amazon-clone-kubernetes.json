@@ -262,33 +262,6 @@
           "refId": "A"
         }
       ]
-    },
-    {
-      "id": 12,
-      "type": "logs",
-      "title": "Kubernetes / Application Logs",
-      "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
-        "y": 39
-      },
-      "datasource": {
-        "type": "loki",
-        "uid": "Loki"
-      },
-      "targets": [
-        {
-          "expr": "{namespace=\"amazon-clone\"}",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "showTime": true,
-        "showLabels": true,
-        "wrapLines": true,
-        "enableLogDetails": true
-      }
     }
   ],
   "schemaVersion": 39,
@@ -305,5 +278,5 @@
   "timezone": "browser",
   "title": "Amazon Clone - Kubernetes",
   "uid": "amazon-clone-kubernetes",
-  "version": 1
+  "version": 2
 }
