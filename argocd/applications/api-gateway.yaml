@@ -8,14 +8,19 @@ metadata:
 spec:
   project: default
 
-  source:
-    repoURL: https://github.com/vamsi-b-m/amazon-clone.git
-    targetRevision: dev
-    path: helm/applications/api-gateway
+  sources:
 
-    helm:
-      valueFiles:
-        - values.yaml
+    - repoURL: https://github.com/vamsi-b-m/amazon-clone.git
+      targetRevision: dev
+      path: helm/applications/api-gateway
+
+      helm:
+        valueFiles:
+          - $values/environments/dev/applications/api-gateway.yaml
+
+    - repoURL: https://github.com/vamsi-b-m/amazon-clone.git
+      targetRevision: dev
+      ref: values
 
   destination:
     server: https://kubernetes.default.svc
@@ -28,4 +33,3 @@ spec:
 
     syncOptions:
       - CreateNamespace=true
-      

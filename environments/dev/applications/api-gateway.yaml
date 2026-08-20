@@ -1,0 +1,19 @@
+global:
+  namespace: amazon-clone
+
+image:
+  repository: 071975552330.dkr.ecr.ap-south-1.amazonaws.com/amazon-clone
+  tag: api-gateway-1.0.0
+  pullPolicy: IfNotPresent
+
+apiGateway:
+  replicas: 1
+
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
