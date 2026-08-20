@@ -12,3 +12,4 @@ resources:
   - rabbitmq.yaml
   - ingress.yaml
   - monitoring.yaml
+  - aws-load-balancer-controller.yaml
