@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image:  {{ .Values.image.repository }}/amazon-clone-notification-service:{{ .Values.image.tag }}
+          image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.notificationService.port }}

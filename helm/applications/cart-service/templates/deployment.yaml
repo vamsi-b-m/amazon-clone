@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: cart-service
-          image:  {{ .Values.image.repository }}/amazon-clone-cart-service:{{ .Values.image.tag }}
+          image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.cartService.port }}
