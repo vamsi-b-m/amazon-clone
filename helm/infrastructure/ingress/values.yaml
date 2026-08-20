@@ -5,7 +5,7 @@ global:
 # ------ Ingress ----------------------------------------------------------------
 ingress:
   enabled: true
-  className: nginx
+  className: alb
 
 # ------ API Gateway ----------------------------------------------------------------
 apiGateway:

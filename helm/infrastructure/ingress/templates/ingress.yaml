@@ -4,7 +4,13 @@ kind: Ingress
 metadata:
   name: amazon-ingress
   namespace: {{ .Values.global.namespace }}
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: "[{'HTTP':80}]"
 spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  
   rules:
     - http:
         paths:
