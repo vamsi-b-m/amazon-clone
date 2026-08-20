@@ -6,9 +6,9 @@ global:
 
 # ------ Image ----------------------------------------------------------------
 image:
-  repository: vamsibm36
-  tag: 1.0.0
-  pullPolicy: Never             # Never for kind (local), always for EKS
+  repository: 071975552330.dkr.ecr.ap-south-1.amazonaws.com/amazon-clone
+  tag: product-service-1.0.0
+  pullPolicy: IfNotPresent             # Never for kind (local), always for EKS
 
 # ------ Product Service ----------------------------------------------------------------
 productService:
