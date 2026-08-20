@@ -68,6 +68,7 @@ metadata:
   name: rabbitmq-pvc
   namespace: {{ .Values.global.namespace }}
 spec:
+  storageClassName: gp3
   accessModes:
     - ReadWriteOnce
   resources:
