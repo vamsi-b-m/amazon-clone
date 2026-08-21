@@ -35,6 +35,10 @@ spec:
                   period: 24h
         singleBinary:
           replicas: 1
+            persistence:
+              enabled: true
+              storageClass: gp3
+              size: 10Gi
         
         backend: 
           replicas: 0
