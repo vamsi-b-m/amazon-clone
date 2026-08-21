@@ -1,10 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
-metadata: 
+metadata:
   name: tempo
   namespace: argocd
+
 spec:
   project: default
+
   source:
     repoURL: https://grafana.github.io/helm-charts
     chart: tempo
@@ -22,6 +24,7 @@ spec:
                   endpoint: "0.0.0.0:4317"
                 http:
                   endpoint: "0.0.0.0:4318"
+
           storage:
             trace:
               backend: local
@@ -36,11 +39,22 @@ spec:
             - ReadWriteOnce
           storageClass: gp3
           size: 10Gi
-  
+
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
-  
+
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      name: tempo
+      namespace: monitoring
+      jqPathExpressions:
+        - .spec.volumeClaimTemplates[].apiVersion
+        - .spec.volumeClaimTemplates[].kind
+        - .spec.volumeClaimTemplates[].metadata.creationTimestamp
+        - .spec.volumeClaimTemplates[].status
+
   syncPolicy:
     automated:
       prune: true
