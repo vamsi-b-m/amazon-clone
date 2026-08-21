@@ -34,7 +34,7 @@ spec:
           enabled: true
           accessModes:
             - ReadWriteOnce
-          storageClassName: gp3
+          storageClass: gp3
           size: 10Gi
   
   destination:
