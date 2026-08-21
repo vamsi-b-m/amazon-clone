@@ -15,6 +15,8 @@ spec:
       values: |
         clusterName: amazon-clone-dev
         region: ap-south-1
+
+        vpcId: vpc-0c340e37e426addb9
         
         serviceAccount:
           create: true
