@@ -14,11 +14,8 @@ spec:
     helm:
       values: |
         clusterName: amazon-clone-dev
-
         region: ap-south-1
-
-        vpcId: vpc-0708a7fb0c43958fe
-
+        
         serviceAccount:
           create: true
           name: aws-load-balancer-controller
